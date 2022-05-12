@@ -21,7 +21,7 @@ export default function App() {
 
   return (
     <SideBar linkItems={linkItems} Logo={logo}>
-      <div>Does it work?</div>
+      <div>En construcción</div>
     </SideBar>
   )
 };
