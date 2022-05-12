@@ -1,26 +1,27 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import SideBar from "./Skeleton/Sidebar/Sidebar";
+import {
+  FiSettings,
+  FiCalendar,
+  FiUsers,
+  FiPaperclip,
+} from 'react-icons/fi';
+import { LinkItemProps } from "./Skeleton/Sidebar/Models/Sidebar.models";
+import { Text } from '@chakra-ui/react';
 
-function App() {
+export default function App() {
+
+  const linkItems: LinkItemProps[] = [
+    { name: 'Calendario', icon: FiCalendar },
+    { name: 'Pacientes', icon: FiUsers },
+    { name: 'Historias clínicas', icon: FiPaperclip },
+    { name: 'Configuración', icon: FiSettings },
+  ];
+
+  const logo = <Text fontSize="2xl" ml="8" fontFamily="monospace" fontWeight="bold">Focus</Text>;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
-
-export default App;
+    <SideBar linkItems={linkItems} Logo={logo}>
+      <div>Does it work?</div>
+    </SideBar>
+  )
+};
