@@ -2,8 +2,8 @@ import { AgGridReact } from 'ag-grid-react';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import { useRef, useState } from 'react';
-import { Box, Button, Center, Flex, FormLabel, Input, InputGroup, InputLeftAddon, InputRightAddon, Select, Spacer, Stack, Textarea, useConst, useDisclosure } from '@chakra-ui/react';
+import { useRef, useState, useEffect } from 'react';
+import { Box, Button, Center, Flex, FormLabel, Input, Select, Spacer, Stack, Textarea, useConst, useDisclosure } from '@chakra-ui/react';
 import { FiPlusSquare } from 'react-icons/fi';
 import {
   Drawer,
@@ -14,25 +14,53 @@ import {
   DrawerContent,
   DrawerCloseButton,
 } from '@chakra-ui/react'
+import { MedicalRecordApi } from '../Api/MedicalRecordDB';
+import { useForm } from '../Hooks/useForm';
+import { json } from 'stream/consumers';
 
 export default function App() {
+
+  const [rowData, setRowData] = useState<any>([]);
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const firstField = useRef() as React.MutableRefObject<HTMLInputElement>;
 
   const columns = useConst([
     { headerName: 'Nombre', field: 'name' },
     { headerName: 'Correo', field: 'email' },
     { headerName: 'Telefono', field: 'phone' },
-    { headerName: 'Profesional', field: 'doctor' },
+    { headerName: 'Profesional', field: 'doctor', valueGetter: (params: any) => params.data.doctor.nombre },
   ]);
 
-  const [rowData] = useState([
-    { name: 'Juan Perez', email: 'asd@asd', phone: '123456789', doctor: 'Dr. Juan Perez' },
-    { name: 'Juan Perez', email: 'asd@asd', phone: '123456789', doctor: 'Dr. Juan Perez' },
-    { name: 'Juan Perez', email: 'asd@asd', phone: '123456789', doctor: 'Dr. Juan Perez' },
-    { name: 'Juan Perez', email: 'asd@asd', phone: '123456789', doctor: 'Dr. Juan Perez' }
-  ]);
+  var maxNumber = 45;
+  var randomNumber = Math.floor((Math.random() * maxNumber) + 1);
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const firstField = useRef() as React.MutableRefObject<HTMLInputElement>;
+  const { name, email, phone, onChange, form } = useForm({
+    name: 'Mercedes Palazzo',
+    email: `mercepalazzo${randomNumber}@hotmail.com`,
+    phone: '51546546',
+    doctor: '627aaa1814202566d0047f95',
+    description: ''
+  })
+
+  useEffect(() => {
+    MedicalRecordApi.get('/patients')
+      .then(({ data }) => setRowData(data.patients))
+      .catch(console.log)
+  }, []);
+
+  const sendForm = () => {
+    MedicalRecordApi.post('/patients', form, {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-token': localStorage.getItem('token') || ''
+      },
+    })
+      .then(({ data }) => {
+        setRowData([...rowData, data])
+        onClose()
+      })
+      .catch(console.log)
+  }
 
   return (
     <>
@@ -56,6 +84,7 @@ export default function App() {
                 suppressRowClickSelection={true}
                 rowSelection={'multiple'}
               />
+              {JSON.stringify(form, null, 2)}
             </Box>
           </Stack>
         </Box>
@@ -81,6 +110,8 @@ export default function App() {
                   ref={firstField}
                   id='username'
                   placeholder='Nombre y apellido paciente'
+                  value={name}
+                  onChange={(e) => onChange(e.target.value, 'name')}
                 />
               </Box>
               <Box>
@@ -88,6 +119,8 @@ export default function App() {
                 <Input
                   id='email'
                   placeholder='Mail paciente'
+                  value={email}
+                  onChange={(e) => onChange(e.target.value, 'email')}
                 />
               </Box>
               <Box>
@@ -95,14 +128,16 @@ export default function App() {
                 <Input
                   id='phone'
                   placeholder='Telefono paciente'
+                  value={phone}
+                  onChange={(e) => onChange(e.target.value, 'phone')}
                 />
               </Box>
 
               <Box>
                 <FormLabel htmlFor='doctor'>Profesional a cargo</FormLabel>
-                <Select id='owner' defaultValue='mercedes'>
-                  <option value='mercedes'>Mercedes Palazzo</option>
-                  <option value='florencia'>Florencia</option>
+                <Select id='owner' defaultValue='627aaa1814202566d0047f95'>
+                  <option value='627aaa1814202566d0047f95'>Mercedes Palazzo</option>
+                  <option value='627aaa1814202566d0047f95'>Florencia</option>
                 </Select>
               </Box>
 
@@ -117,7 +152,7 @@ export default function App() {
             <Button variant='outline' mr={3} onClick={onClose}>
               Cancelar
             </Button>
-            <Button colorScheme='teal'>Guardar</Button>
+            <Button colorScheme='teal' onClick={sendForm}>Guardar</Button>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
