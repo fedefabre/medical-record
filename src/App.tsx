@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fi';
 import { LinkItemProps } from "./Skeleton/Sidebar/Models/Sidebar.models";
 import { Text } from '@chakra-ui/react';
+import Patients from "./Views/Patients";
 
 export default function App() {
 
@@ -21,7 +22,8 @@ export default function App() {
 
   return (
     <SideBar linkItems={linkItems} Logo={logo}>
-      <div>En construcción</div>
+      <Patients />
     </SideBar>
   )
 };
+  
