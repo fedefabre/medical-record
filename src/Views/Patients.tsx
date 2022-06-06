@@ -2,7 +2,7 @@ import { AgGridReact } from 'ag-grid-react';
 
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-alpine.css';
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { Box, Button, Center, Flex, FormLabel, Input, Select, Spacer, Stack, Textarea, useConst, useDisclosure } from '@chakra-ui/react';
 import { FiPlusSquare } from 'react-icons/fi';
 import {
@@ -17,12 +17,19 @@ import {
 import { MedicalRecordApi } from '../Api/MedicalRecordDB';
 import { useForm } from '../Hooks/useForm';
 import { json } from 'stream/consumers';
+import { useQuery } from 'react-query';
 
-export default function App() {
+export default function Patients() {
 
   const [rowData, setRowData] = useState<any>([]);
   const { isOpen, onOpen, onClose } = useDisclosure()
   const firstField = useRef() as React.MutableRefObject<HTMLInputElement>;
+  // TODO add skeleton for the grid and the content
+  const { isLoading, error } = useQuery('patients', () =>
+    MedicalRecordApi.get('/patients')
+      .then(({ data }) => setRowData(data.patients))
+      .catch(console.log)
+  )
 
   const columns = useConst([
     { headerName: 'Nombre', field: 'name' },
@@ -31,6 +38,7 @@ export default function App() {
     { headerName: 'Profesional', field: 'doctor', valueGetter: (params: any) => params.data.doctor.nombre },
   ]);
 
+  // TODO: Remove this when the API is ready
   var maxNumber = 45;
   var randomNumber = Math.floor((Math.random() * maxNumber) + 1);
 
@@ -41,12 +49,6 @@ export default function App() {
     doctor: '627aaa1814202566d0047f95',
     description: ''
   })
-
-  useEffect(() => {
-    MedicalRecordApi.get('/patients')
-      .then(({ data }) => setRowData(data.patients))
-      .catch(console.log)
-  }, []);
 
   const sendForm = () => {
     MedicalRecordApi.post('/patients', form, {
@@ -62,21 +64,27 @@ export default function App() {
       .catch(console.log)
   }
 
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (error) {
+    return <div>Error</div>
+  }
+
   return (
     <>
       <Stack>
         <h1>Pacientes</h1>
         <Box>
           <Stack>
-            <>
-              <Flex >
-                <Center>Listado de pacientes</Center>
-                <Spacer />
-                <Button leftIcon={<FiPlusSquare />} colorScheme='teal' variant='solid' onClick={onOpen}>
-                  Nuevo paciente
-                </Button>
-              </Flex>
-            </>
+            <Flex>
+              <Center>Listado de pacientes</Center>
+              <Spacer />
+              <Button leftIcon={<FiPlusSquare />} colorScheme='teal' variant='solid' onClick={onOpen}>
+                Nuevo paciente
+              </Button>
+            </Flex>
             <Box className="ag-theme-alpine" style={{ height: '80vh' }}>
               <AgGridReact
                 columnDefs={columns}
@@ -84,7 +92,6 @@ export default function App() {
                 suppressRowClickSelection={true}
                 rowSelection={'multiple'}
               />
-              {JSON.stringify(form, null, 2)}
             </Box>
           </Stack>
         </Box>
