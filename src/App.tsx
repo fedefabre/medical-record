@@ -11,6 +11,8 @@ import { Text } from '@chakra-ui/react';
 import SideBar from "./Skeleton/Sidebar/Sidebar";
 import Patients from "./Views/Patients";
 import { LinkItemProps } from "./Skeleton/Sidebar/Models/Sidebar.models";
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Patient from './Views/Patient';
 
 const queryClient = new QueryClient()
 
@@ -30,8 +32,14 @@ export default function App() {
   return (
     <SideBar linkItems={linkItems} Logo={logo}>
       <QueryClientProvider client={queryClient}>
-        { /* Router  */}
-        <Patients />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<>Default component</>} />
+            <Route path="/patients" element={<Patients />} />
+            <Route path="/patient/:patientName/:patientId" element={<Patient />} />
+            <Route path="*" element={<>Not found</>} />
+          </Routes>
+        </BrowserRouter>
       </QueryClientProvider>
     </SideBar>
   )
