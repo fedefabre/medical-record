@@ -14,25 +14,33 @@ import {
   DrawerContent,
   DrawerCloseButton,
 } from '@chakra-ui/react'
-import { MedicalRecordApi } from '../Api/MedicalRecordDB';
+import { getPatients, MedicalRecordApi } from '../Api/MedicalRecordDB';
 import { useForm } from '../Hooks/useForm';
-import { json } from 'stream/consumers';
 import { useQuery } from 'react-query';
+import { CellClickedEvent } from 'ag-grid-community';
+import { useNavigate } from 'react-router-dom';
 
 export default function Patients() {
 
+  const navigation = useNavigate();
   const [rowData, setRowData] = useState<any>([]);
   const { isOpen, onOpen, onClose } = useDisclosure()
   const firstField = useRef() as React.MutableRefObject<HTMLInputElement>;
   // TODO add skeleton for the grid and the content
-  const { isLoading, error } = useQuery('patients', () =>
-    MedicalRecordApi.get('/patients')
-      .then(({ data }) => setRowData(data.patients))
-      .catch(console.log)
-  )
+  const { isLoading, error } = useQuery('patients', getPatients, {
+    onSuccess: (data) => {
+      setRowData(data.patients);
+    }
+  });
+
+  function convertToSlug(text: string): string {
+    return text.toLowerCase()
+               .replace(/[^\w ]+/g, '')
+               .replace(/ +/g, '-');
+  }
 
   const columns = useConst([
-    { headerName: 'Nombre', field: 'name' },
+    { headerName: 'Nombre', field: 'name', onCellClicked: (event: CellClickedEvent) => navigation(`/patient/${convertToSlug(event.data.name)}/${event.data.uid}`) },
     { headerName: 'Correo', field: 'email' },
     { headerName: 'Telefono', field: 'phone' },
     { headerName: 'Profesional', field: 'doctor', valueGetter: (params: any) => params.data.doctor.nombre },

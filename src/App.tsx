@@ -6,6 +6,7 @@ import {
 } from 'react-icons/fi';
 
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { ReactQueryDevtools } from 'react-query/devtools'
 import { Text } from '@chakra-ui/react';
 
 import SideBar from "./Skeleton/Sidebar/Sidebar";
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="*" element={<>Not found</>} />
           </Routes>
         </BrowserRouter>
+        <ReactQueryDevtools />
       </QueryClientProvider>
     </SideBar>
   )
