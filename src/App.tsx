@@ -21,7 +21,7 @@ export default function App() {
 
   const linkItems: LinkItemProps[] = [
     { name: 'Calendario', icon: FiCalendar },
-    { name: 'Pacientes', icon: FiUsers },
+    { name: 'Pacientes', icon: FiUsers, url: '/patients' },
     { name: 'Historias clínicas', icon: FiPaperclip },
     { name: 'Configuración', icon: FiSettings },
   ];
@@ -31,18 +31,18 @@ export default function App() {
   // TODO: Abstract wrappers
 
   return (
-    <SideBar linkItems={linkItems} Logo={logo}>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
+    <BrowserRouter>
+      <SideBar linkItems={linkItems} Logo={logo}>
+        <QueryClientProvider client={queryClient}>
           <Routes>
             <Route path="/" element={<>Default component</>} />
             <Route path="/patients" element={<Patients />} />
             <Route path="/patient/:patientName/:patientId" element={<Patient />} />
             <Route path="*" element={<>Not found</>} />
           </Routes>
-        </BrowserRouter>
-        <ReactQueryDevtools />
-      </QueryClientProvider>
-    </SideBar>
+          <ReactQueryDevtools />
+        </QueryClientProvider>
+      </SideBar>
+    </BrowserRouter>
   )
 };

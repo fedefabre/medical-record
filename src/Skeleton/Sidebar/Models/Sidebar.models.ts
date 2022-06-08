@@ -10,6 +10,7 @@ export interface SideBarInterface {
 
 export interface LinkItemProps {
   name: string;
+  url?: string;
   icon: IconType;
 }
 
@@ -22,6 +23,7 @@ export interface SidebarProps extends BoxProps {
 export interface NavItemProps extends FlexProps {
   icon: IconType;
   children: ReactNode;
+  link: string;
 }
 
 export interface MobileProps extends FlexProps {

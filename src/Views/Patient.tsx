@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom"
 import { useQuery, UseQueryResult } from 'react-query';
 import { getPatient } from "../Api/MedicalRecordDB";
-import { IPatient } from "../Models/Patients.interface";
+import { IPatient } from "../Models/Patients.models";
 
 export default function Patient() {
   const { patientId = ''} = useParams();
