@@ -13,7 +13,7 @@ import {
 import { FiMenu } from 'react-icons/fi';
 import { MobileProps, NavItemProps, SideBarInterface, SidebarProps } from './Models/Sidebar.models';
 import { colors } from '../../Styles/variables';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 export default function SideBar({ children, linkItems, Logo }: SideBarInterface) {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -61,7 +61,7 @@ const SidebarContent = ({ onClose, linkItems, Logo, ...rest }: SidebarProps) => 
         {Logo && (Logo)}
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      {linkItems.map(({name, icon, url = '#'}) => (
+      {linkItems.map(({ name, icon, url = '#' }) => (
         <NavItem key={name} icon={icon} link={url}>
           {name}
         </NavItem>
@@ -72,7 +72,7 @@ const SidebarContent = ({ onClose, linkItems, Logo, ...rest }: SidebarProps) => 
 
 const NavItem = ({ icon, children, link, ...rest }: NavItemProps) => {
   return (
-    <Link href={link} style={{ textDecoration: 'none' }} _focus={{ boxShadow: 'none' }}>
+    <Link as={NavLink} to={link} _activeLink={{fontWeight: 'bold'}}>
       <Flex
         align="center"
         p="4"
@@ -97,7 +97,7 @@ const NavItem = ({ icon, children, link, ...rest }: NavItemProps) => {
         )}
         {children}
       </Flex>
-    </Link>
+    </Link >
   );
 };
 

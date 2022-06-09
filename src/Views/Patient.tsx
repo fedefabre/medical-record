@@ -18,6 +18,6 @@ export default function Patient() {
   }
 
   return (
-    <div>{data.name}</div>
+    <h1>{data.name}</h1>
   )
 }
