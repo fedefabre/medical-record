@@ -4,3 +4,10 @@ export interface IPatient {
   phone: string;
   doctor: any;
 }
+
+export interface IRecord {
+  id: string;
+  record: string;
+  patient: IPatient;
+  
+}

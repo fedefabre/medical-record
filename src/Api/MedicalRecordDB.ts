@@ -5,5 +5,8 @@ export const MedicalRecordApi = axios.create({
   //baseURL: 'https://medical-record-mern.herokuapp.com/api',
 })
 
-export const getPatients = () => MedicalRecordApi.get('/patients', {params: {limite: 100}}).then(({ data }) => data);
+export const getPatients = () => MedicalRecordApi.get('/patients').then(({ data }) => data);
 export const getPatient = (id: string) => MedicalRecordApi.get(`/patients/${id}`).then(({ data }) => data);
+
+export const getRecords = () => MedicalRecordApi.get('/records').then(({ data }) => data.records);
+export const getRecord = (id: string) => MedicalRecordApi.get(`/records/${id}`).then(({ data }) => data);
