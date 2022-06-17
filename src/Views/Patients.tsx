@@ -89,7 +89,7 @@ export default function Patients() {
             <Flex>
               <Center>Listado de pacientes</Center>
               <Spacer />
-              <Button leftIcon={<FiPlusSquare />} colorScheme='teal' variant='solid' onClick={onOpen}>
+              <Button leftIcon={<FiPlusSquare />} onClick={onOpen}>
                 Nuevo paciente
               </Button>
             </Flex>
