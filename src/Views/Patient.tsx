@@ -1,20 +1,36 @@
 import { useParams } from "react-router-dom"
-import { useQuery, UseQueryResult } from 'react-query';
-import { getPatient, getRecord } from '../Api/MedicalRecordDB';
-import { IPatient, IRecord } from "../Models/Patients.models";
-import { Box, Button, Flex, FormControl, FormErrorMessage, Stack, Textarea } from "@chakra-ui/react";
-import { useForm } from "react-hook-form";
+import { useMutation, useQuery, UseQueryResult, useQueryClient } from 'react-query';
+import { getPatient, getRecord, postRecord } from '../Api/MedicalRecordDB';
+import { IPatient, IRecord, IRecordPost } from "../Models/Patients.models";
+import { Box, Button, Flex, FormControl, FormErrorIcon, FormErrorMessage, Spinner, Stack, Textarea } from "@chakra-ui/react";
+import { Resolver, useForm } from "react-hook-form";
 
 export default function Patient() {
   const { patientId = '' } = useParams();
   const { data, isLoading, isIdle, error }: UseQueryResult<IPatient, Error> = useQuery<IPatient, Error>(['patient', patientId], () => getPatient(patientId));
   const { data: records, isLoading: recordIsLoading, error: recordError }: UseQueryResult<IRecord[], Error> = useQuery<IRecord[], Error>(['record', patientId], () => getRecord(patientId));
+  const queryClient = useQueryClient();
 
   const {
     handleSubmit,
     register,
-    formState: { errors, isSubmitting },
-  } = useForm()
+    formState: { errors, isSubmitting, isValid },
+  } = useForm<IRecordPost>({
+    mode: "onChange"
+  })
+
+  // use mutation 
+
+  const { mutate, isLoading: isLoadingMutation } = useMutation(postRecord, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['record', patientId]);
+    }
+  });
+
+
+  function onSubmit(values: { record: string }) {
+    mutate({ patient: patientId, record: values.record }, { onSuccess: (record) => queryClient.setQueryData(['record', patientId], (prevRecords: any) => prevRecords.concat(record)) })
+  }
 
   if (isLoading || isIdle) {
     return <div>Loading...</div>
@@ -24,10 +40,6 @@ export default function Patient() {
     return <div>Error</div>
   }
 
-  function onSubmit(values: any) {
-    console.log(values);
-  }
-
   return (
     <Stack>
       <h1>{data.name}</h1>
@@ -35,26 +47,32 @@ export default function Patient() {
         <Flex direction="column">
           <h2>Medical Record</h2>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <FormControl isInvalid={errors.name}>
+            <FormControl>
               <Textarea
                 id='record'
                 placeholder='Historia clínica de hoy'
                 {...register('record', {
-                  required: 'This is required'
+                  required: 'El nuevo registro es requerido',
+                  minLength: 3
                 })}
               />
               <FormErrorMessage>
-                {errors.name && errors.name.message}
+                <span>{errors.record && errors.record.message}</span>
               </FormErrorMessage>
             </FormControl>
-            <Button mt={4} colorScheme='teal' isLoading={isSubmitting} type='submit'>
+            <Button mt={4} colorScheme='teal' isLoading={isSubmitting} type='submit' disabled={isValid || isLoadingMutation}>
+              {isLoadingMutation && <Spinner size='sm' mr="1" />}
               Submit
             </Button>
           </form>
+          {recordIsLoading && <Spinner />}
+          {recordError && <FormErrorIcon />}
           {records && records.map(record => (
-            <Box key={record.id}>
+            <Box key={record._id}>
               <h3>{record.patient.name}</h3>
               <p>{record.record}</p>
+              <p>{record.creationDate}</p>
+              <hr></hr>
             </Box>
           ))}
         </Flex>

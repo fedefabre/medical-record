@@ -14,7 +14,7 @@ import {
   DrawerContent,
   DrawerCloseButton,
 } from '@chakra-ui/react'
-import { getPatients, MedicalRecordApi } from '../Api/MedicalRecordDB';
+import { getPatients, postPatient } from '../Api/MedicalRecordDB';
 import { useForm } from '../Hooks/useForm';
 import { useQuery } from 'react-query';
 import { CellClickedEvent } from 'ag-grid-community';
@@ -59,12 +59,7 @@ export default function Patients() {
   })
 
   const sendForm = () => {
-    MedicalRecordApi.post('/patients', form, {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-token': localStorage.getItem('token') || ''
-      },
-    })
+    postPatient(form)
       .then(({ data }) => {
         setRowData([...rowData, data])
         onClose()

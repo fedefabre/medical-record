@@ -6,8 +6,12 @@ export interface IPatient {
 }
 
 export interface IRecord {
-  id: string;
+  _id: string;
   record: string;
   patient: IPatient;
-  
+  creationDate: string;
+}
+
+export interface IRecordPost {
+  record: string;
 }
