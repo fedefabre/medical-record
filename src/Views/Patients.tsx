@@ -75,6 +75,7 @@ export default function Patients() {
     return <div>Error</div>
   }
 
+
   return (
     <>
       <Stack>
